@@ -12,29 +12,31 @@ https://blog.csdn.net/spark_fountain/article/details/90635073
 
 ## 启动程序
 
+下载好的 数据文件保存在 `data_file` 路径下面，数据解析按行读取，数据格式为 JSON 格式。
+
 ```bash
 $ php btpsider server start -d
 
          ____ ___________       _     __
         / __ )_  __/ ___/____  (_)___/ /__  _____
        / __  |/ /  \__ \/ __ \/ / __  / _ \/ ___/
-      / /_/ // /  ___/ / /_/ / / /_/ /  __/ /    
-     /_____//_/  /____/ .___/_/\__,_/\___/_/     
+      / /_/ // /  ___/ / /_/ / / /_/ /  __/ /
+     /_____//_/  /____/ .___/_/\__,_/\___/_/
                      /_/
- --------------- ----------------------------------------------------------- 
-  name            BTSpider
-  log_path      
-  swoole_host     0.0.0.0
-  swoole_ports    6882
-  swoole_log      /home/admin/workerspace/bt-spider/storage/logs/swoole.log  
-  worker_num      4
-  dispatch_mode   2
-  reload_async    1
-  log_level       2
-  log_file        /home/admin/workerspace/bt-spider/storage/logs/swoole.log  
-  stats_file      /home/admin/workerspace/bt-spider/storage/logs/_stats.log  
-  pid_file        /home/admin/workerspace/bt-spider/storage/tmp/swoole.pid   
- --------------- ----------------------------------------------------------- 
+ ----------------- ------------------------------------------------------------- 
+  name              BTSpider
+  data_file         /home/admin/workerspace/bt-spider/storage/data/btspider.txt
+  stats_file        /home/admin/workerspace/bt-spider/storage/logs/_btstats.log
+  log_file          /home/admin/workerspace/bt-spider/storage/logs/btspider.log
+  swoole_host       0.0.0.0
+  swoole_ports      6882
+  swoole_log_file   /home/admin/workerspace/bt-spider/storage/logs/swoole.log    
+  worker_num        4
+  dispatch_mode     2
+  reload_async      1
+  log_level         2
+  pid_file          /home/admin/workerspace/bt-spider/storage/tmp/swoole.pid
+ ----------------- -------------------------------------------------------------
 ```
 
 ## 查看状态

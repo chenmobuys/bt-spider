@@ -69,10 +69,12 @@ class ServerCommand extends Command
 
         $row = [
             'name' => $this->app['config']->get('name'),
-            'log_path' => $this->app['config']->get('log_path'),
+            'data_file' => $this->app['config']->get('data_file'),
+            'stats_file' => $this->app['config']->get('stats_file'),
+            'log_file' => $this->app['config']->get('log_file'),
             'swoole_host' => $this->app['config']->get('server.host'),
             'swoole_ports' => implode('|', $serverPorts),
-            'swoole_log' => $this->app['config']->get('server.settings.log_file'),
+            'swoole_log_file' => $this->app['config']->get('server.settings.log_file'),
             'worker_num' =>  $this->app['config']->get('worker.worker_num'),
         ] + $this->app['config']->get('server.settings', []);
 
