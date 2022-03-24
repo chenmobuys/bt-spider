@@ -1,0 +1,26 @@
+{
+    "name": "chen/bt-spider",
+    "type": "project",
+    "license": "GPL",
+    "authors": [
+        {
+            "name": "Chenmobuys",
+            "email": "chenmobuys@gmai.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "BTSpider\\": "src/"
+        }
+    },
+    "require-dev": {
+        "swoole/ide-helper": "^4.8"
+    },
+    "require": {
+        "ext-swoole": "^4.8.7",
+        "carbondate/carbon": "^1.33",
+        "illuminate/container": "^8.83",
+        "monolog/monolog": "^2.3",
+        "symfony/console": "^5.4"
+    }
+}

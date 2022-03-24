@@ -1,0 +1,16 @@
+#!/usr/bin/env php
+<?php
+
+define('BTSPIDER_ROOT', __DIR__);
+
+define('BTSPIDER_START', microtime(true));
+
+date_default_timezone_set('PRC');
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+$app = new BTSpider\Application(BTSPIDER_ROOT);
+
+$status = $app->terminate();
+
+exit($status);
