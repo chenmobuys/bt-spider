@@ -36,12 +36,12 @@ class ServerEvent
         });
     }
 
-    public static function workerError(Server $server, int $worker_id, int $worker_pid, int $exit_code, int $signal)
+    public static function workerError()
     {
         swoole_error_log(SWOOLE_LOG_ERROR, 'Worker Error');
     }
 
-    public static function workerExit(Server $server, int $worker_id, int $worker_pid, int $exit_code, int $signal)
+    public static function workerExit()
     {
         swoole_error_log(SWOOLE_LOG_ERROR, 'Worker Exit');
     }
@@ -75,26 +75,31 @@ class ServerEvent
                 switch ($q) {
                     case DHTService::PING:
                         $targetNodeId = Utils::neighborBytes($data['a']['id'] ?: Utils::randomBytes(), $nodeId);
-                        Worker::task(new ResponseTask('pingReceive', [$data['t'], $clientAddress, $clientPort, $targetNodeId]));
+                        Worker::task(new ResponseTask('pingReceive',
+                            [$data['t'], $clientAddress, $clientPort, $targetNodeId]));
                         Worker::task(new FindNodeTask($clientAddress, $clientPort, $data['a']['id']));
                         break;
                     case  DHTService::FIND_NODE:
                         $targetNodeId = Utils::neighborBytes($data['a']['id'] ?: Utils::randomBytes(), $nodeId);
-                        Worker::task(new ResponseTask('findNodeReceive', [$data['t'], $clientAddress, $clientPort, $targetNodeId, '']));
+                        Worker::task(new ResponseTask('findNodeReceive',
+                            [$data['t'], $clientAddress, $clientPort, $targetNodeId, '']));
                         Worker::task(new FindNodeTask($clientAddress, $clientPort, $data['a']['id']));
                         break;
                     case DHTService::GET_PEERS:
                         $token = substr($data['a']['info_hash'], 0, 2);
                         $targetNodeId = Utils::neighborBytes($data['a']['id'] ?: Utils::randomBytes(), $nodeId);
                         $table->addNode(['id' => $data['a']['id'], 'ip' => $clientAddress, 'port' => $clientPort]);
-                        Worker::task(new ResponseTask('getPeersReceive', [$data['t'], $clientAddress, $clientPort, $targetNodeId, '', $token]));
+                        Worker::task(new ResponseTask('getPeersReceive',
+                            [$data['t'], $clientAddress, $clientPort, $targetNodeId, '', $token]));
                         Worker::task(new FindNodeTask($clientAddress, $clientPort, $data['a']['id']));
                         Worker::task(new GetPeersTask($data['a']['info_hash']));
                         break;
                     case DHTService::ANNOUNCE_PEER:
-                        Worker::task(new ResponseTask('announcePeerReceive', [$data['t'], $clientAddress, $clientPort, $nodeId]));
+                        Worker::task(new ResponseTask('announcePeerReceive',
+                            [$data['t'], $clientAddress, $clientPort, $nodeId]));
                         if ($data['a']['token'] = substr($data['a']['info_hash'], 0, 2)) {
-                            Worker::task(new FetchMetadataTask($clientAddress, $data['a']['port'], $data['a']['info_hash']));
+                            Worker::task(new FetchMetadataTask($clientAddress, $data['a']['port'],
+                                $data['a']['info_hash']));
                         }
                         break;
                 }
@@ -124,15 +129,15 @@ class ServerEvent
     private static function getStatusData(Server $server)
     {
         return [
-            'master_pid' => $server->master_pid,
-            'manager_pid' => $server->manager_pid,
-            'worker_id' => $server->worker_id,
-            'worker_pid' => $server->worker_pid,
-            'start_time' => $server->stats()['start_time'],
-            'request_count' => $server->stats()['request_count'],
+            'master_pid'     => $server->master_pid,
+            'manager_pid'    => $server->manager_pid,
+            'worker_id'      => $server->worker_id,
+            'worker_pid'     => $server->worker_pid,
+            'start_time'     => $server->stats()['start_time'],
+            'request_count'  => $server->stats()['request_count'],
             'process_tables' => array_values(iterator_to_array(Process::getInfoTable())),
-            'worker_tables' => array_values(iterator_to_array(Worker::getInfoTable())),
-            'task_tables' => array_values(iterator_to_array(Worker::getTaskTable())),
+            'worker_tables'  => array_values(iterator_to_array(Worker::getInfoTable())),
+            'task_tables'    => array_values(iterator_to_array(Worker::getTaskTable())),
         ];
     }
 }

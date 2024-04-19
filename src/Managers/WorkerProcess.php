@@ -4,11 +4,11 @@
 namespace BTSpider\Managers;
 
 use BTSpider\Support\Contracts\ProcessInterface;
-use Exception;
-use SplQueue;
 use BTSpider\Support\Contracts\TaskInterface;
 use BTSpider\Support\Facades\Config;
 use BTSpider\Support\Facades\Process as ProcessManager;
+use Exception;
+use SplQueue;
 use Swoole\Atomic\Long;
 use Swoole\Coroutine;
 use Swoole\Coroutine\Channel;
@@ -50,18 +50,24 @@ class WorkerProcess implements ProcessInterface
      */
     protected $taskQueue;
 
-    /** 
+    /**
      * @var \Swoole\Atomic\Long
      */
     protected $taskIdAtomic;
 
-    /** 
+    /**
      * @var \Swoole\Table
      */
     protected $taskTable;
 
-    public function __construct(string $processName, string $processGroup, int $workerIndex, Table $infoTable, Long $taskIdAtomic, Table $taskTable)
-    {
+    public function __construct(
+        string $processName,
+        string $processGroup,
+        int $workerIndex,
+        Table $infoTable,
+        Long $taskIdAtomic,
+        Table $taskTable
+    ) {
         $this->processName = $processName;
 
         $this->processGroup = $processGroup;
@@ -139,7 +145,7 @@ class WorkerProcess implements ProcessInterface
                     continue;
                 }
 
-                $taskId =  $this->taskIdAtomic->add(1);
+                $taskId = $this->taskIdAtomic->add(1);
                 Coroutine::create(function ($task, $taskId) {
                     try {
                         $this->infoTable->decr($this->workerIndex, 'waiting', 1);
@@ -163,16 +169,16 @@ class WorkerProcess implements ProcessInterface
     {
         $pTable = ProcessManager::getInfoTable();
         $pTable->set($p->pid, [
-            'pid' => $p->pid,
-            'hash' => spl_object_hash($p),
-            'processName' => $this->processName,
+            'pid'          => $p->pid,
+            'hash'         => spl_object_hash($p),
+            'processName'  => $this->processName,
             'processGroup' => $this->processGroup,
-            'startTime' => time(),
+            'startTime'    => time(),
         ]);
 
         Timer::tick(1 * 1000, function () use ($pTable, $p) {
             $pTable->set($p->pid, [
-                'memoryUsage' => memory_get_usage(),
+                'memoryUsage'     => memory_get_usage(),
                 'memoryPeakUsage' => memory_get_peak_usage(true)
             ]);
         });
@@ -185,7 +191,10 @@ class WorkerProcess implements ProcessInterface
             } finally {
                 Timer::clearAll();
                 Process::signal(SIGTERM, null);
-                Event::exit();
+                // Event::exit();
+                // print_r(Coroutine::stats());
+                // print_r(Coroutine::list());
+                // print_r(Coroutine::listCoroutines());
             }
         });
 
@@ -215,23 +224,23 @@ class WorkerProcess implements ProcessInterface
         });
 
         $this->infoTable->set($this->workerIndex, [
-            'pid' => $p->pid,
-            'waiting' => 0,
-            'running' => 0,
-            'success' => 0,
-            'failure' => 0,
-            'exceed' => 0,
+            'pid'       => $p->pid,
+            'waiting'   => 0,
+            'running'   => 0,
+            'success'   => 0,
+            'failure'   => 0,
+            'exceed'    => 0,
             'startTime' => time()
         ]);
 
         $this->taskTable->set($this->workerIndex, [
-            'pid' => $p->pid,
-            \BTSpider\Task\BootstrapTask::class => 0,
+            'pid'                                   => $p->pid,
+            \BTSpider\Task\BootstrapTask::class     => 0,
             \BTSpider\Task\FetchMetadataTask::class => 0,
-            \BTSpider\Task\FindNodeTask::class => 0,
-            \BTSpider\Task\GetPeersTask::class => 0,
-            \BTSpider\Task\ResponseTask::class => 0,
-            'startTime' => time()
+            \BTSpider\Task\FindNodeTask::class      => 0,
+            \BTSpider\Task\GetPeersTask::class      => 0,
+            \BTSpider\Task\ResponseTask::class      => 0,
+            'startTime'                             => time()
         ]);
 
         try {
@@ -245,6 +254,7 @@ class WorkerProcess implements ProcessInterface
         $socket = $p->exportSocket();
         $socket->setProtocol($this->getProtocol());
 
+        $free_wait_time = Config::get('worker.free_wait_time', 0.001);
         while (true) {
             $recv = $socket->recv();
             $data = unserialize($recv);
@@ -263,6 +273,7 @@ class WorkerProcess implements ProcessInterface
                     }
                 });
             }
+            Coroutine::sleep($free_wait_time);
         }
     }
 

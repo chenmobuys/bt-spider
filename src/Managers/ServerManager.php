@@ -59,7 +59,7 @@ class ServerManager
         $host = Config::get('server.host');
         $port = Config::get('server.port');
         $settings = Config::get('server.settings', []);
-        self::$server = new Server($host, $port, SWOOLE_PROCESS, SWOOLE_UDP);
+        self::$server = new Server($host, $port, SWOOLE_BASE, SWOOLE_UDP);
         self::$server->set($settings);
     }
 

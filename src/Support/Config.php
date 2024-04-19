@@ -111,6 +111,7 @@ class Config implements ArrayAccess, JsonSerializable
      * @param  string  $key
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key)
     {
         return $this->get($key);
@@ -139,6 +140,7 @@ class Config implements ArrayAccess, JsonSerializable
         $this->set($key, null);
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return json_encode($this->all());

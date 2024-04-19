@@ -3,8 +3,8 @@
 namespace BTSpider\Commands;
 
 use BTSpider\Support\Utils;
-use InvalidArgumentException;
 use Illuminate\Container\Container;
+use InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -27,8 +27,8 @@ class ServerCommand extends Command
 
     protected function configure()
     {
-        $this->setDescription($this->app['config']->get('name') . ' 管理器');
-        $this->addArgument('action', InputArgument::REQUIRED, '支持操作: ' . implode('|', self::$supportActions));
+        $this->setDescription($this->app['config']->get('name').' 管理器');
+        $this->addArgument('action', InputArgument::REQUIRED, '支持操作: '.implode('|', self::$supportActions));
         $this->addOption('daemon', 'd', InputOption::VALUE_NONE, '使用守护进程运行');
     }
 
@@ -36,7 +36,7 @@ class ServerCommand extends Command
     {
         $action = $input->getArgument('action');
         if ($action && !in_array($action, self::$supportActions)) {
-            throw new InvalidArgumentException('不支持该操作: ' . $action);
+            throw new InvalidArgumentException('不支持该操作: '.$action);
         }
 
         if ($input->hasOption('daemon') && $input->getOption('daemon')) {
@@ -58,7 +58,7 @@ class ServerCommand extends Command
                 if (!\Swoole\Process::kill($pid, 0)) {
                     @unlink($pidFile);
                 } else {
-                    $this->app['style']->error('PID：' . $pid . ' 已经运行，请勿重复操作。');
+                    $this->app['style']->error('PID：'.$pid.' 已经运行，请勿重复操作。');
                     return Command::FAILURE;
                 }
             }
@@ -68,17 +68,17 @@ class ServerCommand extends Command
         array_unshift($serverPorts, $this->app['config']->get('server.port'));
 
         $row = [
-            'name' => $this->app['config']->get('name'),
-            'data_file' => $this->app['config']->get('data_file'),
-            'stats_file' => $this->app['config']->get('stats_file'),
-            'log_file' => $this->app['config']->get('log_file'),
-            'swoole_host' => $this->app['config']->get('server.host'),
-            'swoole_ports' => implode('|', $serverPorts),
-            'swoole_log_file' => $this->app['config']->get('server.settings.log_file'),
-            'worker_num' =>  $this->app['config']->get('worker.worker_num'),
-        ] + $this->app['config']->get('server.settings', []);
+                'name'            => $this->app['config']->get('name'),
+                'data_file'       => $this->app['config']->get('data_file'),
+                'stats_file'      => $this->app['config']->get('stats_file'),
+                'log_file'        => $this->app['config']->get('log_file'),
+                'swoole_host'     => $this->app['config']->get('server.host'),
+                'swoole_ports'    => implode('|', $serverPorts),
+                'swoole_log_file' => $this->app['config']->get('server.settings.log_file'),
+                'worker_num'      => $this->app['config']->get('worker.worker_num'),
+            ] + $this->app['config']->get('server.settings', []);
 
-        $this->app['style']->text('<info>' . Utils::logo() . '</info>');
+        $this->app['style']->text('<info>'.Utils::logo().'</info>');
         $this->app['style']->horizontalTable(array_keys($row), [array_values($row)]);
 
         $this->app['server']->getServer()->start();
@@ -96,12 +96,12 @@ class ServerCommand extends Command
 
         $pid = file_get_contents($pidFile);
         if (!\Swoole\Process::kill($pid, 0)) {
-            $this->app['style']->warning('PID：' . $pid . ' 不存在');
+            $this->app['style']->warning('PID：'.$pid.' 不存在');
             unlink($pidFile);
             return Command::FAILURE;
         }
         \Swoole\Process::kill($pid, SIGUSR1);
-        $this->app['style']->success('PID：' . $pid . ' 发送重启命令成功。时间：' . date("Y-m-d H:i:s"));
+        $this->app['style']->success('PID：'.$pid.' 发送重启命令成功。时间：'.date("Y-m-d H:i:s"));
         return Command::SUCCESS;
     }
 
@@ -124,12 +124,12 @@ class ServerCommand extends Command
 
         $pid = file_get_contents($pidFile);
         if (!\Swoole\Process::kill($pid, 0)) {
-            $this->app['style']->warning('PID：' . $pid . ' 不存在');
+            $this->app['style']->warning('PID：'.$pid.' 不存在');
             unlink($pidFile);
             return Command::FAILURE;
         }
 
-        \Swoole\Process::kill($pid, SIGKILL);
+        \Swoole\Process::kill($pid, SIGTERM);
 
         $time = time();
         while (true) {
@@ -138,14 +138,15 @@ class ServerCommand extends Command
                 if (is_file($pidFile)) {
                     @unlink($pidFile);
                 }
-                $this->app['style']->success('PID：' . $pid . ' 发送停止命令成功。时间：' . date("Y-m-d H:i:s"));
+                $this->app['style']->success('PID：'.$pid.' 发送停止命令成功。时间：'.date("Y-m-d H:i:s"));
                 break;
             } else {
-                if (time() - $time > 5) {
-                    $this->app['style']->error('PID：' . $pid . ' 发送停止命令失败。请重试或者使用 --force 参数强制停止进程。');
+                if (time() - $time > 20) {
+                    $this->app['style']->error('PID：'.$pid.' 发送停止命令失败。请稍后重试。');
                     break;
                 }
             }
+            \Swoole\Process::kill($pid, SIGTERM);
         }
         return Command::SUCCESS;
     }
