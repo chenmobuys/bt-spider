@@ -36,7 +36,7 @@ $ php btpsider server start -d
 ## 查看状态
 
 ```bash
-$ php btpsider server status
+$ php btspider server status
 
  --------- ----------- ------------------- ------------------- -------------- ----------------- --------------------- 
                                                     Monitor Board
