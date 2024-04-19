@@ -4,12 +4,6 @@
 
 实现了 [BEP 05](http://www.bittorrent.org/beps/bep_0005.html)、[BEP 09](http://www.bittorrent.org/beps/bep_0009.html) 协议。
 
-## TODO
-
-https://sunyunqiang.com/blog/bittorrent_protocol/#133-bittorrent-tracker
-
-https://blog.csdn.net/spark_fountain/article/details/90635073
-
 ## 启动程序
 
 下载好的 数据文件保存在 `data_file` 路径下面，数据解析按行读取，数据格式为 JSON 格式。
@@ -85,3 +79,9 @@ $ php btspider server stop
 ## 备注
 
 如果需要修改配置，直接复制 `src/config.php` 文件到项目根目录即可。
+
+## 其他
+
+https://sunyunqiang.com/blog/bittorrent_protocol/#133-bittorrent-tracker
+
+https://blog.csdn.net/spark_fountain/article/details/90635073
