@@ -9,7 +9,7 @@
 下载好的 数据文件保存在 `data_file` 路径下面，数据解析按行读取，数据格式为 JSON 格式。
 
 ```bash
-$ php btpsider server start -d
+$ php btspider server start -d
 
          ____ ___________       _     __
         / __ )_  __/ ___/____  (_)___/ /__  _____
